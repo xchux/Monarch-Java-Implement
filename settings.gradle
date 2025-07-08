@@ -1,0 +1,12 @@
+rootProject.name = 'monarch-java-implement'
+
+include 'common-types'
+include 'leaf-service'
+include 'leaf-router'
+include 'zone-mixer'
+include 'zone-index-server'
+include 'root-mixer'
+include 'range-assigner'
+include 'recovery-consumer'
+include 'evaluator'
+include 'configuration-server'

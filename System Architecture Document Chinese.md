@@ -24,7 +24,7 @@
 
 整體架構分為 **全域 (Global)** 和 **區域 (Zone)** 兩個層級，並依照功能劃分為三類元件：狀態持久化 (藍色)、查詢執行 (綠色)、資料寫入 (紅色)。
 
-*(圖片來源:)*
+*(圖片來源: [Monarch.png](Monarch.png))*
 
 #### **2.1. 核心元件職責**
 
@@ -285,49 +285,49 @@ public class Exemplar {
 | **Spring Boot** | `3.3.x` | 核心開發框架。提供快速、獨立的微服務應用建構能力。此版本與 Java 21 完全相容，並包含最新的依賴項管理。 |
 | **Spring WebFlux**| (內建於 Spring Boot) | 用於建構非阻塞、反應式的 Web 應用。非常適合 `Router` 和 `Mixer` 這類需要處理大量併發 I/O 的網路密集型服務。 |
 | **Spring Data JPA** | (內建於 Spring Boot) | 用於 `Configuration Server`，簡化與 PostgreSQL 資料庫的互動，快速實現設定的持久化。 |
-| **Spring for Apache Kafka**| (內建於 Spring Boot) | [cite\_start]整合 Apache Kafka，用於 `Leaf` 節點向 Kafka 非同步寫入復原日誌 (Recovery Logs) [cite: 170, 284]。 |
+| **Spring for Apache Kafka**| (內建於 Spring Boot) | 整合 Apache Kafka，用於 `Leaf` 節點向 Kafka 非同步寫入復原日誌 (Recovery Logs) [cite: 170, 284]。 |
 | **Lombok** | `1.18.32` | 減少 Java POJO (如 `Target`, `Metric`, `TimeSeriesPoint` 等資料模型) 的樣板程式碼，提高開發效率。 |
 
 #### **建構與依賴管理 (Build & Dependency Management)**
 
 | 工具 | 建議版本 | 用途說明 |
 | :--- | :--- | :--- |
-| **Gradle** | `8.8.x` | (建議) 專案建構和依賴管理工具。對於複雜的多模組 (multi-module) 微服務專案，Gradle 提供更靈活和高效的建構腳本。 |
-| **Maven** | `3.9.x` | (備選) 另一主流專案建構工具。若團隊對 Maven 更熟悉，亦是完全可行的選擇。 |
+| **Gradle** | `8.8.x` | 專案建構和依賴管理工具。對於複雜的多模組 (multi-module) 微服務專案，Gradle 提供更靈活和高效的建構腳本。 |
+
 
 #### **資料庫與儲存 (Database & Storage)**
 
 | 工具 | 建議版本 | 用途說明 |
 | :--- | :--- | :--- |
-| **PostgreSQL** | `16.x` | [cite\_start]用於 `Configuration Server` 的後端關聯式資料庫。Monarch 使用 Spanner [cite: 172, 535]，我們選擇功能強大且開源的 PostgreSQL 作為替代方案。 |
-| **Apache Kafka** | `3.7.x` | [cite\_start]作為 `Leaf` 節點的復原日誌 (Recovery Logs) [cite: 170] 系統。提供高吞吐量、持久化和高可用性的日誌流，解耦了 `Leaf` 與底層檔案系統。 |
-| **In-Memory Storage** | N/A | [cite\_start]`Leaf` 節點的核心資料將使用 Java 內建的執行緒安全資料結構 (如 `ConcurrentHashMap`) 存放於記憶體中 [cite: 169, 285][cite\_start]，這是 Monarch 的核心設計之一 [cite: 5, 94]。 |
+| **PostgreSQL** | `16.x` | 用於 `Configuration Server` 的後端關聯式資料庫。Monarch 使用 Spanner [cite: 172, 535]，我們選擇功能強大且開源的 PostgreSQL 作為替代方案。 |
+| **Apache Kafka** | `3.7.x` | 作為 `Leaf` 節點的復原日誌 (Recovery Logs) 系統。提供高吞吐量、持久化和高可用性的日誌流，解耦了 `Leaf` 與底層檔案系統。 |
+| **In-Memory Storage** | N/A | `Leaf` 節點的核心資料將使用 Java 內建的執行緒安全資料結構 (如 `ConcurrentHashMap`) 存放於記憶體中，這是 Monarch 的核心設計之一。 |
 
 #### **通訊 (Communication)**
 
 | 工具 | 建議版本 | 用途說明 |
 | :--- | :--- | :--- |
 | **RESTful API (JSON)** | (HTTP/1.1) | 初期服務間通訊的主要方式，易於開發、偵錯和理解。 |
-| **gRPC** | `1.64.x` | [cite\_start](https://www.google.com/search?q=%E9%80%B2%E9%9A%8E/%E6%80%A7%E8%83%BD%E5%84%AA%E5%8C%96) 高效能的 RPC 框架。Monarch 內部使用 streaming RPC [cite: 501]，gRPC 是其現代開源對應。適用於 Mixer 與 Leaf 之間這類需要高性能、低延遲的內部資料交換場景。 |
+| **gRPC** | `1.64.x` | (https://www.google.com/search?q=%E9%80%B2%E9%9A%8E/%E6%80%A7%E8%83%BD%E5%84%AA%E5%8C%96) 高效能的 RPC 框架。Monarch 內部使用 streaming RPC，gRPC 是其現代開源對應。適用於 Mixer 與 Leaf 之間這類需要高性能、低延遲的內部資料交換場景。 |
 
 #### **容器化與部署 (Containerization & Deployment)**
 
 | 工具 | 建議版本 | 用途說明 |
 | :--- | :--- | :--- |
 | **Docker** | `26.x` | 將各個 Spring Boot 微服務打包成標準化的容器，以實現環境一致性。 |
-| **Kubernetes** | `1.30.x` | [cite\_start]容器編排平台。Monarch 運行在 Google 內部的 Borg 系統上 [cite: 192, 265]，Kubernetes 作為 Borg 的開源繼承者，是部署和管理我們分散式系統的最佳選擇。 |
+| **Kubernetes** | `1.30.x` | 容器編排平台。Monarch 運行在 Google 內部的 Borg 系統上，Kubernetes 作為 Borg 的開源繼承者，是部署和管理我們分散式系統的最佳選擇。 |
 
 #### **監控與可觀測性 (Monitoring & Observability)**
 
 | 工具 | 建議版本 | 用途說明 |
 | :--- | :--- | :--- |
 | **Micrometer** | (內建於 Spring Boot) | 應用程式指標門面 (facade)，與 Spring Boot Actuator 深度整合，讓我們可以輕鬆地從應用程式中導出指標。 |
-| **Prometheus** | `2.52.x` | [cite\_start]時間序列資料庫與監控系統。Prometheus 本身受 Monarch 的前身 Borgmon [cite: 27, 28, 699] 啟發，用它來監控我們自己開發的 TSDB 系統在主題上非常契合。 |
-| **Grafana** | `11.x` | [cite\_start]指標視覺化工具。用於建立儀表板，將從 Prometheus 收集的系統運行狀態指標 (如 QPS、延遲、記憶體使用率) 視覺化 [cite: 25]。 |
+| **Prometheus** | `2.52.x` | 時間序列資料庫與監控系統。Prometheus 本身受 Monarch 的前身 Borgmon [cite: 27, 28, 699] 啟發，用它來監控我們自己開發的 TSDB 系統在主題上非常契合。 |
+| **Grafana** | `11.x` | 指標視覺化工具。用於建立儀表板，將從 Prometheus 收集的系統運行狀態指標 (如 QPS、延遲、記憶體使用率) 視覺化 [cite: 25]。 |
 
 #### **輔助函式庫 (Auxiliary Libraries)**
 
 | 函式庫 | 建議版本 | 用途說明 |
 | :--- | :--- | :--- |
-| **HdrHistogram** | `2.2.x` | [cite\_start]一個高效能的直方圖實作。用於在 Java 中高效地實現 Monarch 的 `distribution` 值類型 [cite: 230, 231]，以進行延遲百分位數等統計計算。 |
+| **HdrHistogram** | `2.2.x` | 一個高效能的直方圖實作。用於在 Java 中高效地實現 Monarch 的 `distribution` 值類型 [cite: 230, 231]，以進行延遲百分位數等統計計算。 |
 | **Google Guava** | `33.x` | 提供額外的 Java 核心函式庫功能，如更強大的集合類型、快取、I/O 輔助工具等，非常實用。 |

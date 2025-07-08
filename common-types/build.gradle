@@ -1,0 +1,4 @@
+dependencies {
+    // This module will contain only the data model POJOs
+    // and will not have any Spring Boot dependencies.
+}
